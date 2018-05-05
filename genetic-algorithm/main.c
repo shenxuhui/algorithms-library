@@ -264,9 +264,11 @@ int main(void)
 			}
 			gbest_index = i + 1;
 		}
+		printf("Generation %d, average best is %lf\n",
+			i + 1, average_best[i + 1]);
 	}
 
-	finish = clock();	// 程序计算结束
+	finish = clock();
 	double duration = ((double)(finish - start)) / CLOCKS_PER_SEC;
 	printf("程序计算耗时:%lf秒\n.", duration);
 	printf("遗传算法进化了%d次，最优值为:%d,"
@@ -277,5 +279,6 @@ int main(void)
 		gbest_pos[4], gbest_pos[5], gbest_pos[6], gbest_pos[7],
 		gbest_pos[8], gbest_pos[9], gbest_pos[10], gbest_pos[11],
 		gbest_pos[12], gbest_pos[13], gbest_pos[14], gbest_pos[15]);
+
 	return 0;
 }
