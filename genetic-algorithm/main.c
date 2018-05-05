@@ -5,11 +5,12 @@
 #include<time.h>
 #include<assert.h>
 #define PI 3.1415926
-#define sizepop 50
-#define maxgen 500
+#define sizepop 15
+#define maxgen 50
 #define pcross 0.6
 #define pmutation 0.1
 #define lenchrom 16
+#define PRE_INIT_CHROM_NUMBER 2
 
 int chrom[sizepop][lenchrom];
 int fitness[sizepop];
@@ -19,8 +20,19 @@ int gbest_pos[lenchrom];
 double average_best[maxgen + 1];
 int gbest;
 int gbest_index;
-long int bound_up[lenchrom] = {100, 100, 500, 2000, 2000, 1000, 500,  2000, 200,  50,   50,  50,  200,  50,  50,  50}; //FIXME: improve readable.
-long int bound_down[lenchrom] = {1,  1,   1,   10,   10,   1,   100,   501,  10, -50,  -50,  -50,  10, -50, -50, -50};
+int bound_up[lenchrom] = {50,   30,  300, 1500,  1500, 100,  500,  2200,  100,  20,   50,  20,  100,  50,  50,  50}; //FIXME: improve readable.
+int bound_down[lenchrom] = {1,  1,   1,   500,   900,   1,   100,   1600,  10, -20,  -50,  -20,  10, -50, -50, -50};
+int PRE_INIT_CHROM[PRE_INIT_CHROM_NUMBER][lenchrom] = {{35, 15, 190, 970, 1280, 1, 306, 1930, 68, 3, -31, -6, 48, -15, -20, 5},
+						       {34, 15, 220, 970, 1280, 1, 314, 1930, 68, 3, -31, -3, 48, -15, -20, 5}};
+
+void wtk_fgets(char *buf, int len, FILE* fp)
+{
+	char *r = fgets(buf, len, fp);
+	if (NULL == r) {
+		printf("error occurred in fgets.\n");
+		exit(-1);
+	}
+}
 
 int fit_func(int *arr)
 {
@@ -39,10 +51,10 @@ int fit_func(int *arr)
 	printf("run_buf: %s\n", run_buf);
 
 	for (int i = 0; i < lenchrom; i++) {
-		fgets(return_buf, sizeof(return_buf), fp);
+		wtk_fgets(return_buf, sizeof(return_buf), fp);
 		printf("return_buf: %s", return_buf);
 	}
-	fgets(return_buf, sizeof(return_buf), fp);
+	wtk_fgets(return_buf, sizeof(return_buf), fp);
 	int return_number = atoi(return_buf);
 	printf("return_number: %d\n", return_number);
 
@@ -74,13 +86,24 @@ int *min(int *fitness)
 	return arr;
 }
 
+void pre_init_chrom()
+{
+	for (int i = 0; i < PRE_INIT_CHROM_NUMBER; i++) {
+		for (int j = 0; j < lenchrom; j++) {
+			chrom[i][j] = PRE_INIT_CHROM[i][j];
+		}
+		fitness[i] = fit_func(chrom[i]);
+	}
+}
+
 void init_chrom()
 {
 	double pick_number = 0;
-	for (int i = 0; i < sizepop; i++) {
+	pre_init_chrom();
+	for (int i = PRE_INIT_CHROM_NUMBER; i < sizepop; i++) {
 		for (int j = 0; j < lenchrom; j++) {
 			pick_number = bound_down[j] +
-				(rand()) % (bound_up - bound_down);
+				rand() % (bound_up - bound_down);
 			chrom[i][j] = (int)(pick_number + 0.5);
 		}
 		fitness[i] = fit_func(chrom[i]);
